@@ -6,6 +6,8 @@
 
 ![Recurrent neural net](images/RNN.png)
 
+![Recurrent neural net II](images/rnn2.png)
+
 一般的，h(t-1)是输入，h(t)是输出，在这里，额外的输入是x(t-1)，额外的输出是y(t-1).
 
 ## 2. The probability of a sequence of words
