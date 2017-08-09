@@ -19,3 +19,9 @@
 The probability of a sequence of words转化为已知一组单词，预测下一个单词是某个具体单词的概率。
 
 RAM requirement scales with number of words. 预测下一个单词时，一组单词的所有信息都包含在之前一个neuron当中，所以，内存只需要保存之前一个neuron的信息，所需的内存有限。
+
+## 3. Comparison with other neural networks
+
+可以认为，RecurrentNN是一种实用的Tree recursive neural network，包含着specific assumption。
+
+对于RecurrentNN，可能没有额外的输出y(t-1)，但是在结构上，都是每次加入一个新的neuron。在自然语言处理方面，就是每次加入一个word，或者每次加入一个字。
