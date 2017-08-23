@@ -29,3 +29,8 @@ RAM requirement scales with number of words. 预测下一个单词时，一组�
 ## 4. References
 
 [Understanding LSTM Networks](http://colah.github.io/posts/2015-08-Understanding-LSTMs/)
+
+## 5. Function and application
+
+1. RecurrentNN常用来产生text，也就是用机器来自动写文章，自动翻译
+2. 也可以用机器来自动生产图片（模仿其他图片，避开侵权），比如使用最新的deep learing技术Generative adversarial networks (GANs)
