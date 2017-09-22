@@ -10,11 +10,31 @@
 
 一般的，h(t-1)是输入，h(t)是输出，在这里，额外的输入是x(t-1)，额外的输出是y(t-1).
 
+不同hidden layer之间的变换矩阵W是相同的，相同的W表征着word之间的一样的相邻关系。
+
+正是相同的W，也产生了gradient explode和gradient vanish的问题（如果没有activation layer，多层相同的W意味着W的n次幂，所以会有gradient explode和gradient vanish，即使有activation layer，也还是会有同样的问题），如果W很大，back pass中计算gradient时得到的偏导数就会很大，影响gradient descent的收敛，如果W很小，back pass中计算gradient时得到的偏导数就会很小，gradient descent过程就会收敛的很慢。
+
+还有Long-Term Dependencies的问题：
+
+Sometimes, we only need to look at recent information to perform the present task. For example, consider a language model trying to predict the next word based on the previous ones. If we are trying to predict the last word in “the clouds are in the sky,” we don’t need any further context – it’s pretty obvious the next word is going to be sky. In such cases, where the gap between the relevant information and the place that it’s needed is small, RNNs can learn to use the past information.
+
+But there are also cases where we need more context. Consider trying to predict the last word in the text “I grew up in France… I speak fluent French.” Recent information suggests that the next word is probably the name of a language, but if we want to narrow down which language, we need the context of France, from further back. It’s entirely possible for the gap between the relevant information and the point where it is needed to become very large.
+
+Unfortunately, as that gap grows, RNNs become unable to learn to connect the information.
+
+In theory, RNNs are absolutely capable of handling such “long-term dependencies.” A human could carefully pick parameters for them to solve toy problems of this form. Sadly, in practice, RNNs don’t seem to be able to learn them. 
+
+Thankfully, LSTMs don’t have this problem!
+
+另外，因为cell state的加入，LSTM没有gradient vanish的问题，但是还是会有gradient explode的问题，所以会给gradient设一个threshold，如果gradient超过threshold的话，就把gradient设成该threshold.
+
 ## 2. The probability of a sequence of words
 
 预测The probability of a sequence of words，在两个方面有用，一是自动翻译方面，不同的语言词序不同，二是语音识别方面，同音字到底选取哪个要看整个句子。
 
 ![markov model](images/markov.png)
+
+上面的markov模型其实就是语言学中常说的n-gram model. 在n-gram model中，句子中的每个单词的概率的计算只是由前面几个单词决定的。如果拟合LSTM来做计算的话，每次要看的sequence不一定要很长，固定长度就可以了，如果没有这个假设的话，预测时每次都要把前面所有词囊括进来的话，不管做forward pass还是back pass，计算量都太大了。
 
 The probability of a sequence of words转化为已知一组单词，预测下一个单词是某个具体单词的概率。
 
@@ -34,3 +54,41 @@ RAM requirement scales with number of words. 预测下一个单词时，一组�
 
 1. RecurrentNN常用来产生text，也就是用机器来自动写文章，自动翻译
 2. 也可以用机器来自动生产图片（模仿其他图片，避开侵权），比如使用最新的deep learing技术Generative adversarial networks (GANs)
+
+## 6. LSTM (long short term memory)
+
+Long Short Term Memory networks – usually just called “LSTMs” – are a special kind of RNN, capable of learning long-term dependencies.
+
+LSTMs are explicitly designed to avoid the long-term dependency problem. Remembering information for long periods of time is practically their default behavior, not something they struggle to learn!
+
+LSTMs also have this chain like structure, but the repeating module has a different structure. Instead of having a single neural network layer, there are four, interacting in a very special way.
+
+![LSTM](images/LSTM.png)
+
+其中的sigmoid function充当forget gate的作用，很多值会被压缩成接近0，然后与一个矩阵element-wise相乘时，该矩阵的部分元素就被过滤了，通过舍弃一部分信息，强化剩余的信息。
+
+LSTM中cell state的计算相对简单，就是一乘一加，hidden state的计算相对复杂，有多个gate参与计算。
+
+The key to LSTMs is the cell state, the horizontal line running through the top of the diagram.
+
+The cell state is kind of like a conveyor belt. It runs straight down the entire chain, with only some minor linear interactions. It’s very easy for information to just flow along it unchanged.
+
+The LSTM does have the ability to remove or add information to the cell state, carefully regulated by structures called gates.
+
+Gates are a way to optionally let information through. They are composed out of a sigmoid neural net layer and a pointwise multiplication operation.
+
+The sigmoid layer outputs numbers between zero and one, describing how much of each component should be let through. A value of zero means “let nothing through,” while a value of one means “let everything through!”
+
+An LSTM has three of these gates, to protect and control the cell state.
+
+Earlier, I mentioned the remarkable results people are achieving with RNNs. Essentially all of these are achieved using LSTMs. They really work a lot better for most tasks!
+
+## 7. LSTM的实际应用
+
+对于character-wise RNN with LSTMs (CharRNN)，使用多层LSTM作为hidden layer（前一层LSTM的输出是后一层LSTM的输入），每一层hidden layer也包括多个LSTM，这多个LSTM作为softmax的输入，然后得到softmax的输出，预测最可能是哪个character.
+
+batch_size就是这个batch中包括多少个sequence，num_steps表示每个sequence的长度是多少，所以characters_per_batch就是上面二者的乘积，batch的批数就是文本的总的长度除以characters_per_batch。
+
+在最初试验的时候，经常取batch_size=1，num_steps=1.
+
+lstm_size是每个hidden layer单元包括多少个LSTM，num_layers表示hidden layer中使用多少层LSTM，num_classes表示softmax输出的种类个数。对于RNN (CharRNN)的output layer，是一个fully connected network，weights的维度是lstm_size*num_classes，最后的activation function用的是softmax function.
