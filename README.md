@@ -92,3 +92,5 @@ batch_size就是这个batch中包括多少个sequence，num_steps表示每个seq
 在最初试验的时候，经常取batch_size=1，num_steps=1.
 
 lstm_size是每个hidden layer单元包括多少个LSTM，num_layers表示hidden layer中使用多少层LSTM，num_classes表示softmax输出的种类个数。对于RNN (CharRNN)的output layer，是一个fully connected network，weights的维度是lstm_size*num_classes，最后的activation function用的是softmax function.
+
+输入Xt其实是一个多维的向量，比如one-hot vector或者word embedding，lstm构成的hidden layer其实是有深度的，这个深度就是lstm_size，从Xt到hidden layer也是有一个weight来做线性变换的，如果Xt的维度是n，那么这个weight的维度是n*lstm_size.如果一层lstm之后是另一层lstm，此时上一层的lstm的ht就充当下一层的lstm的Xt，如果两层lstm的深度都是lstm_size的话，两层之间的weight的维度就是lstm*lstm_size。
