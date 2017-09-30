@@ -98,3 +98,9 @@ lstm_size是每个hidden layer单元包括多少个LSTM，num_layers表示hidden
 实际上，从Xt到hidden layer的变换，输入除了Xt，还有h(t-1)，具体操作时，是把Xt，h(t-1)两个向量合并，然后再做线性变换。
 
 从Cell state的C(t-1)到Ct的计算，是不做线性变换的，也就是并不需要乘以一个weight矩阵。正是因为不需要乘以weight，It’s very easy for information to just flow along it unchanged. 在求解gradient时，正是因为不需要weight的cell state的存在，普通RNN所碰到的问题才能得到解决。
+
+## 8. Neural net, CNN, RNN三者的区别
+
+Neural net可以类比为集合set，各个feature之间是独立的，没有先后顺序，也没有相邻关系，CNN可以类比为双向链表，feature之间有相邻关系（左右相邻、上下相邻等），但没有先后顺序，RNN可以类比为单向链表list，feature之间有先后顺序。
+
+图像的像素之间只有相邻关系，没有先后顺序，把图像转过来、倒过来都还是一样的图，但是，对于语音和文字语言，是有先后顺序的，倒背或者倒写完全不可理解。所以RNN比CNN处理自然语言有更大的优势，但是CNN也有一定的作用，和普通的Neural net相比，至少抓住了词与词之间的相邻关系。
