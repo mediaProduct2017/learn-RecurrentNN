@@ -10,7 +10,7 @@
 
 一般的，h(t-1)是输入，h(t)是输出，在这里，额外的输入是x(t-1)，额外的输出是y(t-1).
 
-不同hidden layer之间的变换矩阵W是相同的，相同的W表征着word之间的一样的相邻关系。
+不同hidden layer之间的变换矩阵W是相同的，相同的W表征着word之间的一样的有先有后的相邻关系。
 
 正是相同的W，也产生了gradient explode和gradient vanish的问题（如果没有activation layer，多层相同的W意味着W的n次幂，所以会有gradient explode和gradient vanish，即使有activation layer，也还是会有同样的问题），如果W很大，back pass中计算gradient时得到的偏导数就会很大，影响gradient descent的收敛，如果W很小，back pass中计算gradient时得到的偏导数就会很小，gradient descent过程就会收敛的很慢。
 
