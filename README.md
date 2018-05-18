@@ -104,3 +104,26 @@ lstm_size是每个hidden layer单元包括多少个LSTM，num_layers表示hidden
 Neural net可以类比为集合set，各个feature之间是独立的，没有先后顺序，也没有相邻关系，CNN可以类比为双向链表，feature之间有相邻关系（左右相邻、上下相邻等），但没有先后顺序，RNN可以类比为单向链表list，feature之间有先后顺序。
 
 图像的像素之间只有相邻关系，没有先后顺序，把图像转过来、倒过来都还是一样的图，但是，对于语音和文字语言，是有先后顺序的，倒背或者倒写完全不可理解。所以RNN比CNN处理自然语言有更大的优势，但是CNN也有一定的作用，和普通的Neural net相比，至少抓住了词与词之间的相邻关系。
+
+## 9. Number of parameters in an LSTM model
+
+How many parameters does a single stacked LSTM have? The number of parameters imposes a lower bound on the number of training examples required and also influences the training time. Hence knowing the number of parameters is useful for training models using LSTMs.
+
+对于encoder，样本数尽量要多于参数的个数，准确的说，是独立样本数尽量要多于参数的个数。比如，梅西进球数和C罗进球数，看上去是不同的样本，但因为梅西和C罗的词向量是类似的，从向量的角度看，这两个样本并不是独立样本，实际上是同一个样本。
+
+[Number of parameters in an LSTM model](https://datascience.stackexchange.com/questions/10615/number-of-parameters-in-an-lstm-model)
+
+如上所述，如果lstm所使用的word vector（更准确的说，是input的维数）有m维，所包含的hidden units有n个的话(一层lstm)，单层lstm中的参数的个数是：4(nm+n^2+n)。由于后来的steps使用和之前step相同的lstm参数，所以，增加steps并不增加独立的参数个数。
+
+计算lstm参数个数的具体例子:
+
+[lstm_testing.py](https://github.com/arfu2016/DuReader/blob/master/text-classification/lstm_testing.py)
+
+计算模型中word vector总的参数个数，lstm中的参数个数，classifier中的参数个数，模型中总的参数个数。
+
+对于classifier，每一类的样本个数都要多于分类模型中的参数个数，在上例中，正负类各有1万个样本，logistic classifier的每个类的参数个数是256+1=257，对于classifier来说，样本个数是足够的。
+
+上例中lstm中的参数个数是4(256*300+256*256+256)=4*256(300+256)+4*256=1024*556+1024，相加的这两项分别保存在basic_lstm_cell/weights和basic_lstm_cell/biases，维度也是一致的。
+
+对于单层lstm来说，如果word vector使用300维，hidden units number = 16的话，lstm的参数个数是4*(300*16+16*16+16)=20288，也就是说，对于lstm来说，哪怕hidden units只要16个，也需要两万多个样本才行。
+
